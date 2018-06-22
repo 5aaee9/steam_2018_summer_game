@@ -15,6 +15,7 @@ nvm install 10
 bash
 npm install -g yarn
 git clone https://github.com/Indexyz/steam_2018_summer_game.git
+cd steam_2018_summer_game
 # 编辑 src/index.ts
 # 去 https://steamcommunity.com/saliengame/gettoken 获取 token
 # const userList = [
