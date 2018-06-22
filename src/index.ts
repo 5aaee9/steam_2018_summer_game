@@ -45,6 +45,50 @@ async function SteamGame(userToken: string) {
             }>
         } = plantRequest.data.response
 
+        if (plant.planets.length === 0) {
+            logger.info('selecting best planet')
+            // If no plant selected
+            const getPlanetsRequetst = await axios.post(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=schinese`)
+            const getPlanets: {
+                planets: Array<{
+                    giveaway_apps: Array<number>,
+                    id: string,
+                    state: {
+                        activation_time: number,
+                        active: boolean,
+                        capture_progress: number,
+                        captured: boolean,
+                        cloud_filename: string,
+                        current_players: number,
+                        difficulty: number,
+                        giveaway_id: string,
+                        image_filename: string,
+                        land_filename: string,
+                        map_filename: string,
+                        name: string,
+                        position: number,
+                        priority: number,
+                        tag_ids: string,
+                        total_joins: number,
+                    }
+                }>
+            } = getPlanetsRequetst.data.response
+
+            const plane = getPlanets.planets.filter(item => item.state.active)
+                .filter(item => !item.state.captured)
+                .reduce((best, thisPlanet) => {
+                    if (best.state.capture_progress > thisPlanet.state.capture_progress) {
+                        return thisPlanet
+                    }
+                    return best
+                })
+
+            logger.info(`get best plane => ${plane.state.name}`)
+            await axios.post(`${apiEndpoint}/JoinPlanet/v0001/`, `id=${plane.id}&access_token=${userToken}`)
+            // Add user to STCN group 😜
+            await axios.post(`${apiEndpoint}/RepresentClan/v0001/`, `clanid=103582791429777370&access_token=${userToken}`)
+        }
+
         const zones = plant.planets[0].zones
             .filter(item => !item.captured)
 
