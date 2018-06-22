@@ -46,16 +46,19 @@ async function SteamGame() {
 
         const zones = plant.planets[0].zones
             .filter(item => !item.captured)
-            .sort((left, right) => {
-                return right.difficulty - left.difficulty
-            })
 
         if (zones.length === 0) {
             logger.error('No available zone founded, please change your plant')
             continue
         }
 
-        const zone = zones[0]
+        const zone = zones
+            .reduce((best, thisZone) => {
+                if (thisZone.difficulty > best.difficulty) {
+                    return thisZone
+                }
+                return best
+            })
 
         let post_score = 2320
         if (zone.difficulty === 1) {
@@ -69,6 +72,7 @@ async function SteamGame() {
         logger.info(`exp: ${playerInfo.score} / ${playerInfo.next_level_score}`)
         logger.info(`user at: ${plant.planets[0].state.name}`)
         logger.info(`select zone => ${zone.gameid}`)
+        logger.info(`zone score => ${post_score}`)
         logger.info('===========================')
         const joinRequest = await axios.post(`${apiEndpoint}/JoinZone/v0001/`,
             `zone_position=${zone.zone_position}&access_token=${userInfo.token}`)
