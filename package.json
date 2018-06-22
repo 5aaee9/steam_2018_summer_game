@@ -1,0 +1,25 @@
+{
+    "name": "steam_2018_summer_game",
+    "version": "1.0.0",
+    "main": "src/index.js",
+    "repository": "git@github.com:Indexyz/steam_2018_summer_game.git",
+    "author": "Indexyz <jiduye@gmail.com>",
+    "license": "MIT",
+    "private": false,
+    "scripts": {
+        "build": "tsc",
+        "type-check": "tsc --noEmit",
+        "lint": "eslint src",
+        "dev": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "axios": "^0.18.0",
+        "chalk": "^2.4.1"
+    },
+    "devDependencies": {
+        "@types/node": "^10.3.3",
+        "eslint": "^4.19.1",
+        "ts-node": "^6.1.1",
+        "typescript": "^2.9.2"
+    }
+}

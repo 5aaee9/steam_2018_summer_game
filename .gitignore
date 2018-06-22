@@ -1,0 +1,11 @@
+# Nodejs modules and can get from package.json
+node_modules
+
+# build out dist
+dist
+
+## yarn files
+yarn-error.log
+
+cookies.json
+*.zip
