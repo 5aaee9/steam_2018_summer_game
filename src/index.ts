@@ -24,7 +24,7 @@ async function SteamGame(userToken: string) {
         } = playerInfoRequest.data.response
 
         const plantRequest = await axios.get(`${apiEndpoint}/GetPlanet/v0001/?id=${playerInfo.active_planet}&language=schinese`)
-        const plant: {
+        let plant: {
             planets: Array<{
                 id: string,
                 state: {
@@ -87,6 +87,7 @@ async function SteamGame(userToken: string) {
             await axios.post(`${apiEndpoint}/JoinPlanet/v0001/`, `id=${plane.id}&access_token=${userToken}`)
             // Add user to STCN group 😜
             await axios.post(`${apiEndpoint}/RepresentClan/v0001/`, `clanid=103582791429777370&access_token=${userToken}`)
+            plant = (await axios.get(`${apiEndpoint}/GetPlanet/v0001/?id=${playerInfo.active_planet}&language=schinese`)).data.response
         }
 
         const zones = plant.planets[0].zones
