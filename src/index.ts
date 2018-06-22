@@ -2,16 +2,17 @@ import Utils from './utils'
 import axios from 'axios'
 
 // get token from https://steamcommunity.com/saliengame/gettoken
-const userInfo = {
-    token: 'YOUR_TOKEN',
-}
+// can add many user
+const userList = [
+    'YOUR_TOKEN',
+]
 
 const apiEndpoint = 'https://community.steam-api.com/ITerritoryControlMinigameService'
 
-async function SteamGame() {
-    const logger = new Utils.Logger(Utils.Logger.LEVEL_INFO, 'steam_2018_summer_game')
+async function SteamGame(userToken: string) {
+    const logger = new Utils.Logger(Utils.Logger.LEVEL_INFO, `steam_2018_summer_game (${userToken})`)
     while (true) {
-        const playerInfoRequest = await axios.post(`${apiEndpoint}/GetPlayerInfo/v0001/`, `access_token=${userInfo.token}`)
+        const playerInfoRequest = await axios.post(`${apiEndpoint}/GetPlayerInfo/v0001/`, `access_token=${userToken}`)
         const playerInfo: {
             active_planet: string,
             time_on_planet: number,
@@ -75,7 +76,7 @@ async function SteamGame() {
         logger.info(`zone score => ${post_score}`)
         logger.info('===========================')
         const joinRequest = await axios.post(`${apiEndpoint}/JoinZone/v0001/`,
-            `zone_position=${zone.zone_position}&access_token=${userInfo.token}`)
+            `zone_position=${zone.zone_position}&access_token=${userToken}`)
         const joinMessage: {
             active_planet: string|null,
             level: number|null,
@@ -92,7 +93,7 @@ async function SteamGame() {
         await Utils.Time.wait(120 * Utils.Time.Second)
         logger.info('submit score')
         const requestScoreRequest = await axios.post(`${apiEndpoint}/ReportScore/v0001/`,
-            `access_token=${userInfo.token}&score=${post_score}&language=schinese`)
+            `access_token=${userToken}&score=${post_score}&language=schinese`)
 
         const requestScore: {
             new_score: string,
@@ -102,4 +103,13 @@ async function SteamGame() {
     }
 }
 
-SteamGame().catch(err => console.log(err))
+function userThread(userId: string) {
+    SteamGame(userId).catch(err => {
+        console.log(err)
+        userThread(userId)
+    })
+}
+
+for (const user of userList) {
+    userThread(user)
+}

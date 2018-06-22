@@ -8,6 +8,7 @@
 </p>
 
 ## 快速使用 (Linux)
+使用前先在 steam 页面上加入星球
 ```
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 nvm install 10
@@ -16,10 +17,11 @@ npm install -g yarn
 git clone https://github.com/Indexyz/steam_2018_summer_game.git
 # 编辑 src/index.ts
 # 去 https://steamcommunity.com/saliengame/gettoken 获取 token
-# const userInfo = {
-# ->    token: 'YOUR_TOKEN',
-# }
+# const userList = [
+#    'YOUR_TOKEN',
+# ]
 # 将 YOUR_TOKEN 改为你的 TOKEN
+# 可以填写多个用户的 token
 yarn
 yarn run build
 node dist/index.js
