@@ -48,7 +48,7 @@ async function SteamGame(userToken: string) {
         if (plant.planets === undefined) {
             logger.info('selecting best planet')
             // If no plant selected
-            const getPlanetsRequetst = await axios.post(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=schinese`)
+            const getPlanetsRequetst = await axios.get(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=schinese`)
             const getPlanets: {
                 planets: Array<{
                     giveaway_apps: Array<number>,
