@@ -43,9 +43,9 @@ async function SteamGame(userToken: string) {
                     top_clans: Array<object>
                 }>,
             }>
-        } = plantRequest.data.response
+        }|{} = plantRequest.data.response
 
-        if (plant.planets.length === 0) {
+        if (plant === {}) {
             logger.info('selecting best planet')
             // If no plant selected
             const getPlanetsRequetst = await axios.post(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=schinese`)
