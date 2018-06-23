@@ -93,7 +93,7 @@ async function SteamGame(userToken: string) {
             }>
         } = plantRequest.data.response
 
-        if (times % 100 === 1) {
+        if (times % 10 === 1) {
             await axios.post(`${steamHost}/IMiniGameService/LeaveGame/v0001/`,
                 `access_token=${userToken}&gameid=${playerInfo.active_planet}`)
             logger.info('leaved planet, reselect best')
