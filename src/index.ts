@@ -1,17 +1,65 @@
 import Utils from './utils'
 import axios from 'axios'
+import * as config from 'config'
 
 // get token from https://steamcommunity.com/saliengame/gettoken
 // can add many user
-const userList = [
-    'YOUR_TOKEN',
-]
+const userList = config.get('token')
 
-const apiEndpoint = 'https://community.steam-api.com/ITerritoryControlMinigameService'
+const steamHost = 'https://community.steam-api.com'
+const apiEndpoint = `${steamHost}/ITerritoryControlMinigameService`
+
+
+async function selectPlanet(userToken: string, logger: Utils.Logger) {
+    logger.info('selecting best planet')
+    // If no plant selected
+    const getPlanetsRequetst = await axios.get(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=schinese`)
+    const getPlanets: {
+        planets: Array<{
+            giveaway_apps: Array<number>,
+            id: string,
+            state: {
+                activation_time: number,
+                active: boolean,
+                capture_progress: number,
+                captured: boolean,
+                cloud_filename: string,
+                current_players: number,
+                difficulty: number,
+                giveaway_id: string,
+                image_filename: string,
+                land_filename: string,
+                map_filename: string,
+                name: string,
+                position: number,
+                priority: number,
+                tag_ids: string,
+                total_joins: number,
+            }
+        }>
+    } = getPlanetsRequetst.data.response
+
+    const plane = getPlanets.planets.filter(item => item.state.active)
+        .filter(item => !item.state.captured)
+        .reduce((best, thisPlanet) => {
+            if (best.state.capture_progress > thisPlanet.state.capture_progress) {
+                return thisPlanet
+            }
+            return best
+        })
+
+    logger.info(`get best planet => ${plane.state.name}`)
+    await axios.post(`${apiEndpoint}/JoinPlanet/v0001/`, `id=${plane.id}&access_token=${userToken}`)
+    // Add user to STCN group 😜
+    await axios.post(`${apiEndpoint}/RepresentClan/v0001/`, `clanid=103582791429777370&access_token=${userToken}`)
+}
 
 async function SteamGame(userToken: string) {
     const logger = new Utils.Logger(Utils.Logger.LEVEL_INFO, `steam_2018_summer_game (${userToken})`)
+    let times = 0
     while (true) {
+        times += 1
+
         const playerInfoRequest = await axios.post(`${apiEndpoint}/GetPlayerInfo/v0001/`, `access_token=${userToken}`)
         const playerInfo: {
             active_planet: string,
@@ -24,7 +72,7 @@ async function SteamGame(userToken: string) {
         } = playerInfoRequest.data.response
 
         const plantRequest = await axios.get(`${apiEndpoint}/GetPlanet/v0001/?id=${playerInfo.active_planet}&language=schinese`)
-        let plant: {
+        let planet: {
             planets: Array<{
                 id: string,
                 state: {
@@ -45,52 +93,20 @@ async function SteamGame(userToken: string) {
             }>
         } = plantRequest.data.response
 
-        if (plant.planets === undefined) {
-            logger.info('selecting best planet')
-            // If no plant selected
-            const getPlanetsRequetst = await axios.get(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=schinese`)
-            const getPlanets: {
-                planets: Array<{
-                    giveaway_apps: Array<number>,
-                    id: string,
-                    state: {
-                        activation_time: number,
-                        active: boolean,
-                        capture_progress: number,
-                        captured: boolean,
-                        cloud_filename: string,
-                        current_players: number,
-                        difficulty: number,
-                        giveaway_id: string,
-                        image_filename: string,
-                        land_filename: string,
-                        map_filename: string,
-                        name: string,
-                        position: number,
-                        priority: number,
-                        tag_ids: string,
-                        total_joins: number,
-                    }
-                }>
-            } = getPlanetsRequetst.data.response
-
-            const plane = getPlanets.planets.filter(item => item.state.active)
-                .filter(item => !item.state.captured)
-                .reduce((best, thisPlanet) => {
-                    if (best.state.capture_progress > thisPlanet.state.capture_progress) {
-                        return thisPlanet
-                    }
-                    return best
-                })
-
-            logger.info(`get best plane => ${plane.state.name}`)
-            await axios.post(`${apiEndpoint}/JoinPlanet/v0001/`, `id=${plane.id}&access_token=${userToken}`)
-            // Add user to STCN group 😜
-            await axios.post(`${apiEndpoint}/RepresentClan/v0001/`, `clanid=103582791429777370&access_token=${userToken}`)
-            plant = (await axios.get(`${apiEndpoint}/GetPlanet/v0001/?id=${playerInfo.active_planet}&language=schinese`)).data.response
+        if (times % 100 === 1) {
+            await axios.post(`${steamHost}/IMiniGameService/LeaveGame/v0001/`,
+                `access_token=${userToken}&gameid=${playerInfo.active_planet}`)
+            logger.info('leaved planet, reselect best')
+            await selectPlanet(userToken, logger)
+            continue
         }
 
-        const zones = plant.planets[0].zones
+        if (planet.planets === undefined) {
+            await selectPlanet(userToken, logger)
+            continue
+        }
+
+        const zones = planet.planets[0].zones
             .filter(item => !item.captured)
 
         if (zones.length === 0) {
@@ -116,7 +132,7 @@ async function SteamGame(userToken: string) {
         logger.info('===========================')
         logger.info(`user level: ${playerInfo.level}`)
         logger.info(`exp: ${playerInfo.score} / ${playerInfo.next_level_score}`)
-        logger.info(`user at: ${plant.planets[0].state.name}`)
+        logger.info(`user at: ${planet.planets[0].state.name}`)
         logger.info(`select zone => ${zone.gameid}`)
         logger.info(`zone score => ${post_score}`)
         logger.info('===========================')

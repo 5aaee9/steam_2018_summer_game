@@ -16,11 +16,11 @@ bash
 npm install -g yarn
 git clone https://github.com/Indexyz/steam_2018_summer_game.git
 cd steam_2018_summer_game
-# 编辑 src/index.ts
+# 编辑 config/default.json
 # 去 https://steamcommunity.com/saliengame/gettoken 获取 token
-# const userList = [
-#    'YOUR_TOKEN',
-# ]
+# "token": [
+#     "YOUR_TOKEN"
+#  ]
 # 将 YOUR_TOKEN 改为你的 TOKEN
 # 可以填写多个用户的 token
 yarn
@@ -37,11 +37,11 @@ docker run --name steam_game -d --restart=always -e STEAM_TOKEN=你的TOKEN inde
 ## Windows 下安装
 安装 https://nodejs.org/zh-cn/ 和 https://yarnpkg.com/lang/zh-hans/ 然后 Download Zip 并解压
 ```bash
-# 编辑 src/index.ts
+# 编辑 config/default.json
 # 去 https://steamcommunity.com/saliengame/gettoken 获取 token
-# const userList = [
-#    'YOUR_TOKEN',
-# ]
+# "token": [
+#     "YOUR_TOKEN"
+#  ]
 # 将 YOUR_TOKEN 改为你的 TOKEN
 # 可以填写多个用户的 token
 yarn

@@ -6,11 +6,10 @@ RUN npm install -g yarn && \
 COPY . /app
 WORKDIR /app
 
-RUN yarn && \
+RUN yarn && yarn run build && \
     echo "#!/bin/sh" > /start && \
     echo "set -e" >> /start && \
-    echo "sed -i \"s/'YOUR_TOKEN'/'\$STEAM_TOKEN'/g\" /app/src/index.ts" >> /start && \
-    echo "yarn run build" >> /start && \
+    echo "sed -i 's/\"YOUR_TOKEN\"/\"\$STEAM_TOKEN\"/g' /app/config/default.json" >> /start && \
     echo "node /app/dist/index.js" >> /start && \
     chmod +x /start
 
