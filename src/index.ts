@@ -128,7 +128,7 @@ async function SteamGame(userToken: string) {
                 return best
             })
 
-        let post_score = 2320
+        let post_score = 2400
         if (zone.difficulty === 1) {
             post_score = 585
         } else if (zone.difficulty === 2) {
