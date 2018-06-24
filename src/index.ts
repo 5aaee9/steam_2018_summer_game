@@ -156,8 +156,10 @@ async function SteamGame(userToken: string) {
             logger.error(`server rejected request!`)
             continue
         }
-        logger.info('joined zone, wait 120s to send score')
-        await Utils.Time.wait((110 + getRandomInt(1, 10)) * Utils.Time.Second)
+        const randomSecond = 110 + getRandomInt(1, 10)
+
+        logger.info(`joined zone, wait ${randomSecond}s to send score`)
+        await Utils.Time.wait(randomSecond * Utils.Time.Second)
         logger.info('submit score')
         const requestScoreRequest = await axios.post(`${apiEndpoint}/ReportScore/v0001/`,
             `access_token=${userToken}&score=${post_score}&language=schinese`)
@@ -165,7 +167,12 @@ async function SteamGame(userToken: string) {
         const requestScore: {
             new_score: string,
         } = requestScoreRequest.data.response
-        logger.info(`submit success, new => ${requestScore.new_score}`)
+
+        if (requestScore.new_score === undefined) {
+            logger.warn('get undefined return, may run in other server or IP limited?')
+        } else {
+            logger.info(`submit success, new => ${requestScore.new_score}`)
+        }
         logger.info('===========================')
     }
 }
