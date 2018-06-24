@@ -54,6 +54,12 @@ async function selectPlanet(userToken: string, logger: Utils.Logger) {
     await axios.post(`${apiEndpoint}/RepresentClan/v0001/`, `clanid=103582791429777370&access_token=${userToken}`)
 }
 
+function getRandomInt(min: number, max: number): number {
+    min = Math.ceil(min)
+    max = Math.floor(max)
+    return Math.floor(Math.random() * (max - min)) + min
+}
+
 async function SteamGame(userToken: string) {
     const logger = new Utils.Logger(Utils.Logger.LEVEL_INFO, `steam_2018_summer_game (${userToken})`)
     let times = 0
@@ -151,7 +157,7 @@ async function SteamGame(userToken: string) {
             continue
         }
         logger.info('joined zone, wait 120s to send score')
-        await Utils.Time.wait(120 * Utils.Time.Second)
+        await Utils.Time.wait((110 + getRandomInt(1, 10)) * Utils.Time.Second)
         logger.info('submit score')
         const requestScoreRequest = await axios.post(`${apiEndpoint}/ReportScore/v0001/`,
             `access_token=${userToken}&score=${post_score}&language=schinese`)
