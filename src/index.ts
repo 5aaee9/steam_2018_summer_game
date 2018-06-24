@@ -10,6 +10,11 @@ const steamHost = 'https://community.steam-api.com'
 const apiEndpoint = `${steamHost}/ITerritoryControlMinigameService`
 
 
+let singleton: boolean = false
+if (userList.length === 1) {
+    singleton = true
+}
+
 async function selectPlanet(userToken: string, logger: Utils.Logger) {
     logger.info('selecting best planet')
     // If no plant selected
@@ -61,7 +66,12 @@ function getRandomInt(min: number, max: number): number {
 }
 
 async function SteamGame(userToken: string) {
-    const logger = new Utils.Logger(Utils.Logger.LEVEL_INFO, `steam_2018_summer_game (${userToken})`)
+    let loggerName = `steam_2018_summer_game (${userToken})`
+    if (singleton) {
+        loggerName = `steam_2018_summer_game`
+    }
+
+    const logger = new Utils.Logger(Utils.Logger.LEVEL_INFO, loggerName)
     let times = 0
     while (true) {
         times += 1
