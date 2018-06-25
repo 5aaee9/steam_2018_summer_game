@@ -29,5 +29,9 @@
         "@types/node": "^10.3.3",
         "@types/socket.io": "^1.4.36",
         "eslint": "^4.19.1"
+    },
+    "engines": {
+        "node": "10.4.1",
+        "npm": "6.1.0"
     }
 }
