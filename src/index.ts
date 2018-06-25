@@ -195,8 +195,8 @@ function userThread(userId: string) {
 }
 
 if (typeof userList === "string") {
-    userThread(userList)
     singleton = true
+    userThread(userList)
 } else {
     for (const user of userList) {
         userThread(user)
