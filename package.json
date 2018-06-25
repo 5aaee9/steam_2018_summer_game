@@ -10,7 +10,8 @@
         "build": "tsc",
         "type-check": "tsc --noEmit",
         "lint": "eslint src",
-        "dev": "ts-node src/index.ts"
+        "dev": "ts-node src/index.ts",
+        "web": "ts-node src/web.ts"
     },
     "dependencies": {
         "axios": "^0.18.0",
