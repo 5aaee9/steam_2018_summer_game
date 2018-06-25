@@ -1,0 +1,14 @@
+{
+    "name": "Steam 2018年 夏日小游戏",
+    "description": "自动玩夏日小游戏",
+    "env": {
+        "USER_TOKEN": {
+            "description": "用户Token",
+            "value": ""
+        },
+        "WEB_PASS": {
+            "description": "Web 界面密码",
+            "value": "Password"
+        }
+    }
+}
