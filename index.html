@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Steam Game Logger</title>
+</head>
+<body style='background-color: rgb(30, 30, 30);color: rgb(204, 204, 204);font-family: consolas,-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;font-size: 14px;'>
+    <div id="log"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io(window.location.host)
+        var password = window.prompt("Input your password")
+        socket.on('connect', function() {
+            socket.emit('authentication', {username: "Indexyz", password: password})
+            socket.on('authenticated', function() {
+                socket.on('log', function (data) {
+                    var newData = data.replace(/\[info\]/g, '<font color="blue">[info]</font>')
+                        .replace(/\[warn\]/g, '<font color="yellow">[warn]</font>')
+                        .replace(/\[error\]/g, '<font color="red">[error]</font>')
+                    var logElem = document.getElementById('log')
+                    logElem.innerHTML += ('<p style="margin-top: 0px;margin-bottom: 0px;">' + newData + '</p>')
+                })
+            })
+            socket.on('unauthorized', function(err){
+                alert("Wrong password")
+                window.location.reload()
+            })
+        })
+    </script>
+</body>
+</html>
+
