@@ -8,7 +8,7 @@
 </p>
 
 ## Heroku
-[![](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/Indexyz/steam_2018_summer_game)[一键部署到 Heroku](https://heroku.com/deploy?template=https://github.com/Indexyz/steam_2018_summer_game)
+[![](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/Indexyz/steam_2018_summer_game)
 
 ## 快速使用 (Linux)
 使用前先在 steam 页面上加入星球
