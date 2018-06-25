@@ -12,7 +12,7 @@
         "lint": "eslint src",
         "dev": "ts-node src/index.ts",
         "web": "ts-node src/web.ts",
-        "heroku-prebuild": "yarn --only=dev"
+        "heroku-prebuild": "npm install --only=dev"
     },
     "dependencies": {
         "axios": "^0.18.0",
