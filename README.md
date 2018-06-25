@@ -7,6 +7,9 @@
 <a href="https://nodejs.org/"><img alt="node.js" src="https://img.shields.io/badge/node.js-7.0+-43853d.svg?style=flat-square"/></a>
 </p>
 
+## Heroku
+[![](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/Indexyz/steam_2018_summer_game)[一键部署到 Heroku](https://heroku.com/deploy?template=https://github.com/Indexyz/steam_2018_summer_game)
+
 ## 快速使用 (Linux)
 使用前先在 steam 页面上加入星球
 ```bash
