@@ -1,6 +1,4 @@
 {
-    "token": [
-        "USER_TOKEN"
-    ],
+    "token": "USER_TOKEN",
     "webPass": "WEB_PASS"
 }
