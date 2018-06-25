@@ -11,8 +11,8 @@
 使用前先在 steam 页面上加入星球
 ```bash
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-nvm install 10
 bash
+nvm install 10
 npm install -g yarn
 git clone https://github.com/Indexyz/steam_2018_summer_game.git
 cd steam_2018_summer_game
