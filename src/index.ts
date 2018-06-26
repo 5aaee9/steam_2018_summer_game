@@ -166,22 +166,29 @@ async function SteamGame(userToken: string) {
             logger.error(`server rejected request!`)
             continue
         }
-        const randomSecond = 110 + getRandomInt(1, 10)
+        const randomSecond = 115 + getRandomInt(0, 5)
 
         logger.info(`joined zone, wait ${randomSecond}s to send score`)
         await Utils.Time.wait(randomSecond * Utils.Time.Second)
         logger.info('submit score')
-        const requestScoreRequest = await axios.post(`${apiEndpoint}/ReportScore/v0001/`,
-            `access_token=${userToken}&score=${post_score}&language=schinese`)
+        let retryTimes: number = 0
 
-        const requestScore: {
-            new_score: string,
-        } = requestScoreRequest.data.response
+        while (retryTimes <= 5) {
+            retryTimes += 1
+            logger.info(`start post ${retryTimes + 1}`)
+            const requestScoreRequest = await axios.post(`${apiEndpoint}/ReportScore/v0001/`,
+                `access_token=${userToken}&score=${post_score}&language=schinese`)
 
-        if (requestScore.new_score === undefined) {
-            logger.warn('get undefined return, may run in other server or IP limited?')
-        } else {
-            logger.info(`submit success, new => ${requestScore.new_score}`)
+            const requestScore: {
+                new_score: string,
+            } = requestScoreRequest.data.response
+            if (requestScore.new_score === undefined) {
+                logger.warn('get undefined return, may run in other server or IP limited?')
+                await Utils.Time.wait((retryTimes * 2) * Utils.Time.Second)
+            } else {
+                logger.info(`submit success, new => ${requestScore.new_score}`)
+                break
+            }
         }
         logger.info('===========================')
     }
