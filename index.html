@@ -10,8 +10,8 @@
     <div id="log"></div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        var socket = io(window.location.host)
         var password = window.prompt("Input your password")
+        var socket = io(window.location.host)
         socket.on('connect', function() {
             socket.emit('authentication', {username: "Indexyz", password: password})
             socket.on('authenticated', function() {
