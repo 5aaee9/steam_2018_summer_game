@@ -3,5 +3,13 @@
     "type": "npm",
     "engines": {
         "node": "7.4.0"
+    },
+    "files": [
+        "dist",
+        "config"
+    ],
+    "env": {
+        "USER_TOKEN": "",
+        "WEB_PASS": "Password"
     }
 }
