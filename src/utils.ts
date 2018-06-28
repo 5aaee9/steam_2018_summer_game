@@ -52,7 +52,7 @@ namespace Utils {
             }
 
             const newMessage = `[${name}][${this.prefix}][${moment().format('LTS')}]: ${message}`
-            event.emit(events.LogEvent, `[${noColor}][${this.prefix}][${moment().format('LTS')}]: ${message}`)
+            event.emit(events.LogEvent, `[${noColor}][${this.prefix}][${moment().format('LTS')}]: ${message}`.replace(/ /g, "&nbsp;"))
             out(newMessage)
         }
     }
