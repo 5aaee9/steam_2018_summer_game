@@ -54,6 +54,7 @@ async function selectPlanet(userToken: string, logger: Utils.Logger) {
         })
 
     logger.info(`++ New Planet: ${plane.state.name}`)
+    logger.info(' ')
     await axios.post(`${apiEndpoint}/JoinPlanet/v0001/`, `id=${plane.id}&access_token=${userToken}`)
     // Adding User To SteamCN Group
     await axios.post(`${apiEndpoint}/RepresentClan/v0001/`, `clanid=103582791429777370&access_token=${userToken}`)
@@ -145,10 +146,55 @@ async function SteamGame(userToken: string) {
             post_score = 1170
         }
 
+        var scoreTable = [
+          0,          // Level 1
+          1200,       // Level 2
+          2400,       // Level 3
+          4800,       // Level 4
+          12000,      // Level 5
+          30000,      // Level 6
+          72000,      // Level 7
+          180000,     // Level 8
+          450000,     // Level 9
+          1200000,    // Level 10
+          2400000,    // Level 11
+          3600000,    // Level 12
+          4800000,    // Level 13
+          6000000,    // Level 14
+          7200000,    // Level 15
+          8400000,    // Level 16
+          9600000,    // Level 17
+          10800000,   // Level 18
+          12000000,   // Level 19
+          14600000,   // Level 20
+          16800000,   // Level 21
+        ]
+
+        function getPercentage(current, goal) {
+          let percentage = (Number(current) / Number(goal)) * 100
+          return Math.round(percentage * 100) / 100
+        }
+
+        function timeConvert(mins) {
+          var hours = (mins / 60)
+          var rhours = Math.floor(hours)
+          var minutes = (hours - rhours) * 60
+          var rminutes = Math.round(minutes)
+          return rhours + " hour(s) and " + rminutes + " minute(s)"
+        }
+
+        function getETA(current, goal, reward) {
+          let remaining = (Number(goal) - Number(current)) / Number(reward)
+          let time = remaining * 2
+          return timeConvert(time)
+        }
+
         logger.info(`>> User Level:          ${playerInfo.level}`)
-        var percentage = (Number(playerInfo.score) / Number(playerInfo.next_level_score)) * 100
-        var percentageRounded = Math.round(percentage * 100) / 100
-        logger.info(`   User Score:          ${playerInfo.score} out of ${playerInfo.next_level_score} (${percentageRounded}%)`)
+        logger.info(`   Total Score:         ${playerInfo.score}`)
+        logger.info(`   Level Progress:      ${Number(playerInfo.score) - Number(scoreTable[playerInfo.level - 1])} ` +
+        `out of ${Number(playerInfo.next_level_score) - Number(scoreTable[playerInfo.level - 1])} for level ${playerInfo.level + 1} ` +
+        `(${getPercentage(playerInfo.score, playerInfo.next_level_score)}%)`)
+        logger.info(`   Until Next Level:    ${getETA(playerInfo.score, playerInfo.next_level_score, post_score)}`)
         logger.info(`   User Planet:         ${planet.planets[0].state.name}`)
         logger.info(`   Selected Zone:       ${zone.gameid}`)
         logger.info(`   Zone Reward Score:   ${post_score}`)
