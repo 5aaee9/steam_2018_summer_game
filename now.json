@@ -6,7 +6,10 @@
     },
     "files": [
         "dist",
-        "config"
+        "config",
+        "tsconfig.json",
+        "index.html",
+        "package.json"
     ],
     "env": {
         "USER_TOKEN": "",
