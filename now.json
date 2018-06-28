@@ -1,0 +1,7 @@
+{
+    "name": "steam-2018-summer-game",
+    "type": "npm",
+    "engines": {
+        "node": "7.4.0"
+    }
+}
