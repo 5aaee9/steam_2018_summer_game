@@ -11,3 +11,4 @@ cookies.json
 *.zip
 
 config/porduction.json
+config/default.json

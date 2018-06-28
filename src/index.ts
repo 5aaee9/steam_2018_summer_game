@@ -16,9 +16,9 @@ if (userList.length === 1) {
 }
 
 async function selectPlanet(userToken: string, logger: Utils.Logger) {
-    logger.info('selecting best planet')
-    // If no plant selected
-    const getPlanetsRequetst = await axios.get(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=schinese`)
+    logger.info('   Selected Best Planet')
+    // If No Planet Selected
+    const getPlanetsRequetst = await axios.get(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=english`)
     const getPlanets: {
         planets: Array<{
             giveaway_apps: Array<number>,
@@ -53,9 +53,9 @@ async function selectPlanet(userToken: string, logger: Utils.Logger) {
             return best
         })
 
-    logger.info(`get best planet => ${plane.state.name}`)
+    logger.info(`++ New Planet: ${plane.state.name}`)
     await axios.post(`${apiEndpoint}/JoinPlanet/v0001/`, `id=${plane.id}&access_token=${userToken}`)
-    // Add user to STCN group 😜
+    // Adding User To SteamCN Group
     await axios.post(`${apiEndpoint}/RepresentClan/v0001/`, `clanid=103582791429777370&access_token=${userToken}`)
 }
 
@@ -66,9 +66,9 @@ function getRandomInt(min: number, max: number): number {
 }
 
 async function SteamGame(userToken: string) {
-    let loggerName = `steam_2018_summer_game (${userToken})`
+    let loggerName = `Saliens (${userToken})`
     if (singleton) {
-        loggerName = `steam_2018_summer_game`
+        loggerName = `Saliens`
     }
 
     const logger = new Utils.Logger(Utils.Logger.LEVEL_INFO, loggerName)
@@ -87,7 +87,7 @@ async function SteamGame(userToken: string) {
             next_level_score: string,
         } = playerInfoRequest.data.response
 
-        const plantRequest = await axios.get(`${apiEndpoint}/GetPlanet/v0001/?id=${playerInfo.active_planet}&language=schinese`)
+        const plantRequest = await axios.get(`${apiEndpoint}/GetPlanet/v0001/?id=${playerInfo.active_planet}&language=english`)
         let planet: {
             planets: Array<{
                 id: string,
@@ -112,7 +112,7 @@ async function SteamGame(userToken: string) {
         if (times % 10 === 1) {
             await axios.post(`${steamHost}/IMiniGameService/LeaveGame/v0001/`,
                 `access_token=${userToken}&gameid=${playerInfo.active_planet}`)
-            logger.info('leaved planet, reselect best')
+            logger.info('>> Left Planet, Joining New One')
             await selectPlanet(userToken, logger)
             continue
         }
@@ -126,7 +126,7 @@ async function SteamGame(userToken: string) {
             .filter(item => !item.captured)
 
         if (zones.length === 0) {
-            logger.error('No available zone founded, please change your plant')
+            logger.error('   No Available Zone Found, Please Change Your Planet')
             continue
         }
 
@@ -145,13 +145,14 @@ async function SteamGame(userToken: string) {
             post_score = 1170
         }
 
-        logger.info('===========================')
-        logger.info(`user level: ${playerInfo.level}`)
-        logger.info(`exp: ${playerInfo.score} / ${playerInfo.next_level_score}`)
-        logger.info(`user at: ${planet.planets[0].state.name}`)
-        logger.info(`select zone => ${zone.gameid}`)
-        logger.info(`zone score => ${post_score}`)
-        logger.info('===========================')
+        logger.info(`>> User Level:          ${playerInfo.level}`)
+        var percentage = (Number(playerInfo.score) / Number(playerInfo.next_level_score)) * 100
+        var percentageRounded = Math.round(percentage * 100) / 100
+        logger.info(`   User Score:          ${playerInfo.score} out of ${playerInfo.next_level_score} (${percentageRounded}%)`)
+        logger.info(`   User Planet:         ${planet.planets[0].state.name}`)
+        logger.info(`   Selected Zone:       ${zone.gameid}`)
+        logger.info(`   Zone Reward Score:   ${post_score}`)
+        logger.info(' ')
         const joinRequest = await axios.post(`${apiEndpoint}/JoinZone/v0001/`,
             `zone_position=${zone.zone_position}&access_token=${userToken}`)
         const joinMessage: {
@@ -163,34 +164,34 @@ async function SteamGame(userToken: string) {
         } = joinRequest.data.response
 
         if (joinMessage.score === null) {
-            logger.error(`server rejected request!`)
+            logger.error(`!! Server Rejected Request`)
             continue
         }
         const randomSecond = 115 + getRandomInt(0, 5)
 
-        logger.info(`joined zone, wait ${randomSecond}s to send score`)
+        logger.info(`>> Joined Zone, Waiting ${randomSecond} Seconds Until Submitting Score`)
         await Utils.Time.wait(randomSecond * Utils.Time.Second)
-        logger.info('submit score')
+        logger.info('>> Submitting Score')
         let retryTimes: number = 0
 
         while (retryTimes <= 5) {
             retryTimes += 1
-            logger.info(`start post ${retryTimes + 1}`)
+            logger.info(`   Error Submitting Score (Retry ${retryTimes + 1})`)
             const requestScoreRequest = await axios.post(`${apiEndpoint}/ReportScore/v0001/`,
-                `access_token=${userToken}&score=${post_score}&language=schinese`)
+                `access_token=${userToken}&score=${post_score}&language=english`)
 
             const requestScore: {
                 new_score: string,
             } = requestScoreRequest.data.response
             if (requestScore.new_score === undefined) {
-                logger.warn('get undefined return, may run in other server or IP limited?')
+                logger.warn('   Received Undefined Response, Are There Multiple Instances Running?')
                 await Utils.Time.wait((retryTimes * 2) * Utils.Time.Second)
             } else {
-                logger.info(`submit success, new => ${requestScore.new_score}`)
+                logger.info(`   Submitted Score (Now ${requestScore.new_score})`)
                 break
             }
         }
-        logger.info('===========================')
+        logger.info(' ')
     }
 }
 

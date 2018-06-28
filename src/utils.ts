@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import * as moment from 'moment';
 import event, { events } from './event'
 
 namespace Utils {
@@ -50,8 +51,8 @@ namespace Utils {
                 }
             }
 
-            const newMessage = `[${name}][${this.prefix}][${new Date()}]: ${message}`
-            event.emit(events.LogEvent, `[${noColor}][${this.prefix}][${new Date()}]: ${message}`)
+            const newMessage = `[${name}][${this.prefix}][${moment().format('LTS')}]: ${message}`
+            event.emit(events.LogEvent, `[${noColor}][${this.prefix}][${moment().format('LTS')}]: ${message}`)
             out(newMessage)
         }
     }
