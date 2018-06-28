@@ -2,7 +2,7 @@
     "name": "steam-2018-summer-game",
     "type": "npm",
     "engines": {
-        "node": "10.4.1"
+        "node": "8.11.2"
     },
     "env": {
         "USER_TOKEN": "",
