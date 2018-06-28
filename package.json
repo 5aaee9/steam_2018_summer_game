@@ -21,6 +21,7 @@
         "config": "^1.30.0",
         "koa": "^2.5.1",
         "koa-logger": "^3.2.0",
+        "moment": "^2.22.2",
         "socket.io": "^2.1.1",
         "socketio-auth": "^0.1.1"
     },
