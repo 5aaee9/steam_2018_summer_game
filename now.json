@@ -2,15 +2,8 @@
     "name": "steam-2018-summer-game",
     "type": "npm",
     "engines": {
-        "node": "7.4.0"
+        "node": "10.4.1"
     },
-    "files": [
-        "dist",
-        "config",
-        "tsconfig.json",
-        "index.html",
-        "package.json"
-    ],
     "env": {
         "USER_TOKEN": "",
         "WEB_PASS": "Password"
