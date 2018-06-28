@@ -19,6 +19,7 @@
                     var newData = data.replace(/\[info\]/g, '<font color="#3b8eea">[info]</font>')
                         .replace(/\[warn\]/g, '<font color="#b0d33b">[warn]</font>')
                         .replace(/\[error\]/g, '<font color="#c82e2e">[error]</font>')
+                        .replace(/ /g, "&nbsp;")
                     var logElem = document.getElementById('log')
                     logElem.innerHTML += ('<p style="margin-top: 0px;margin-bottom: 0px;">' + newData + '</p>')
                 })
