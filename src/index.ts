@@ -222,7 +222,7 @@ async function SteamGame(userToken: string) {
 
         while (retryTimes <= 5) {
             retryTimes += 1
-            logger.info(`   Error Submitting Score (Retry ${retryTimes + 1})`)
+            logger.info(`   Submitting Score (Retry ${retryTimes})`)
             const requestScoreRequest = await axios.post(`${apiEndpoint}/ReportScore/v0001/`,
                 `access_token=${userToken}&score=${post_score}&language=english`)
 
