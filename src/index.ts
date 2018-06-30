@@ -1,63 +1,14 @@
 import Utils from './utils'
-import axios from 'axios'
+import Requests from './requests'
 import * as config from 'config'
 
 // get token from https://steamcommunity.com/saliengame/gettoken
 // can add many user
 const userList = config.get('token')
 
-const steamHost = 'https://community.steam-api.com'
-const apiEndpoint = `${steamHost}/ITerritoryControlMinigameService`
-
-
 let singleton: boolean = false
 if (userList.length === 1) {
     singleton = true
-}
-
-async function selectPlanet(userToken: string, logger: Utils.Logger) {
-    logger.info('   Selected Best Planet')
-    // If No Planet Selected
-    const getPlanetsRequetst = await axios.get(`${apiEndpoint}/GetPlanets/v0001/?active_only=1&language=english`)
-    const getPlanets: {
-        planets: Array<{
-            giveaway_apps: Array<number>,
-            id: string,
-            state: {
-                activation_time: number,
-                active: boolean,
-                capture_progress: number,
-                captured: boolean,
-                cloud_filename: string,
-                current_players: number,
-                difficulty: number,
-                giveaway_id: string,
-                image_filename: string,
-                land_filename: string,
-                map_filename: string,
-                name: string,
-                position: number,
-                priority: number,
-                tag_ids: string,
-                total_joins: number,
-            }
-        }>
-    } = getPlanetsRequetst.data.response
-
-    const plane = getPlanets.planets.filter(item => item.state.active)
-        .filter(item => !item.state.captured)
-        .reduce((best, thisPlanet) => {
-            if (best.state.capture_progress > thisPlanet.state.capture_progress) {
-                return thisPlanet
-            }
-            return best
-        })
-
-    logger.info(`++ New Planet: ${plane.state.name}`)
-    logger.info(' ')
-    await axios.post(`${apiEndpoint}/JoinPlanet/v0001/`, `id=${plane.id}&access_token=${userToken}`)
-    // Adding User To SteamCN Group
-    await axios.post(`${apiEndpoint}/RepresentClan/v0001/`, `clanid=103582791429777370&access_token=${userToken}`)
 }
 
 function getRandomInt(min: number, max: number): number {
@@ -73,53 +24,24 @@ async function SteamGame(userToken: string) {
     }
 
     const logger = new Utils.Logger(Utils.Logger.LEVEL_INFO, loggerName)
+    const requests = new Requests.SalienGame(userToken, logger)
     let times = 0
+
     while (true) {
         times += 1
+        const playerInfo = await requests.getPlayerInfoRequest()
 
-        const playerInfoRequest = await axios.post(`${apiEndpoint}/GetPlayerInfo/v0001/`, `access_token=${userToken}`)
-        const playerInfo: {
-            active_planet: string,
-            time_on_planet: number,
-            active_zone_game: string,
-            active_zone_position: string,
-            score: string,
-            level: number,
-            next_level_score: string,
-        } = playerInfoRequest.data.response
-
-        const plantRequest = await axios.get(`${apiEndpoint}/GetPlanet/v0001/?id=${playerInfo.active_planet}&language=english`)
-        let planet: {
-            planets: Array<{
-                id: string,
-                state: {
-                    name: string,
-                },
-                giveaway_apps: Array<any>,
-                top_clans: Array<any>,
-                zones: Array<{
-                    zone_position: number,
-                    leader: object,
-                    type: number,
-                    gameid: string,
-                    difficulty: number,
-                    captured: boolean,
-                    capture_progress: number,
-                    top_clans: Array<object>
-                }>,
-            }>
-        } = plantRequest.data.response
+        const planet = await requests.getPlanetInfoRequest(playerInfo.active_planet)
 
         if (times % 10 === 1) {
-            await axios.post(`${steamHost}/IMiniGameService/LeaveGame/v0001/`,
-                `access_token=${userToken}&gameid=${playerInfo.active_planet}`)
+            await requests.leaveRequest()
             logger.info('>> Left Planet, Joining New One')
-            await selectPlanet(userToken, logger)
+            await requests.selectPlanetRequest()
             continue
         }
 
         if (planet.planets === undefined) {
-            await selectPlanet(userToken, logger)
+            await requests.selectPlanetRequest()
             continue
         }
 
@@ -146,7 +68,7 @@ async function SteamGame(userToken: string) {
             post_score = 1170
         }
 
-        var scoreTable = [
+        const scoreTable = [
           0,          // Level 1
           1200,       // Level 2
           2400,       // Level 3
@@ -171,22 +93,22 @@ async function SteamGame(userToken: string) {
         ]
 
         function getPercentage(current, goal) {
-          let percentage = (Number(current) / Number(goal)) * 100
-          return Math.round(percentage * 100) / 100
+            const percentage = (Number(current) / Number(goal)) * 100
+            return Math.round(percentage * 100) / 100
         }
 
         function timeConvert(mins) {
-          var hours = (mins / 60)
-          var rhours = Math.floor(hours)
-          var minutes = (hours - rhours) * 60
-          var rminutes = Math.round(minutes)
-          return rhours + " hour(s) and " + rminutes + " minute(s)"
+            const hours = (mins / 60)
+            const rhours = Math.floor(hours)
+            const minutes = (hours - rhours) * 60
+            const rminutes = Math.round(minutes)
+            return rhours + " hour(s) and " + rminutes + " minute(s)"
         }
 
         function getETA(current, goal, reward) {
-          let remaining = (Number(goal) - Number(current)) / Number(reward)
-          let time = remaining * 2
-          return timeConvert(time)
+            const remaining = (Number(goal) - Number(current)) / Number(reward)
+            const time = remaining * 2
+            return timeConvert(time)
         }
 
         logger.info(`>> User Level:          ${playerInfo.level}`)
@@ -199,16 +121,8 @@ async function SteamGame(userToken: string) {
         logger.info(`   Selected Zone:       ${zone.gameid}`)
         logger.info(`   Zone Reward Score:   ${post_score}`)
         logger.info(' ')
-        const joinRequest = await axios.post(`${apiEndpoint}/JoinZone/v0001/`,
-            `zone_position=${zone.zone_position}&access_token=${userToken}`)
-        const joinMessage: {
-            active_planet: string|null,
-            level: number|null,
-            next_level_score : string|null,
-            score : string|null,
-            time_on_planet : number|null,
-        } = joinRequest.data.response
 
+        const joinMessage = await requests.joinZoneRequest(zone.zone_position);
         if (joinMessage.score === null) {
             logger.error(`!! Server Rejected Request`)
             continue
@@ -223,12 +137,8 @@ async function SteamGame(userToken: string) {
         while (retryTimes <= 5) {
             retryTimes += 1
             logger.info(`   Submitting Score (Retry ${retryTimes})`)
-            const requestScoreRequest = await axios.post(`${apiEndpoint}/ReportScore/v0001/`,
-                `access_token=${userToken}&score=${post_score}&language=english`)
+            const requestScore = await requests.postScoreRequest(post_score)
 
-            const requestScore: {
-                new_score: string,
-            } = requestScoreRequest.data.response
             if (requestScore.new_score === undefined) {
                 logger.warn('   Received Undefined Response, Are There Multiple Instances Running?')
                 await Utils.Time.wait((retryTimes * 2) * Utils.Time.Second)
