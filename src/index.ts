@@ -46,7 +46,7 @@ async function SteamGame(userToken: string) {
         }
 
         const zones = planet.planets[0].zones
-            .filter(item => !item.captured)
+            .filter(item => !item.captured && item.top_clans)
 
         if (zones.length === 0) {
             logger.error('   No Available Zone Found, Please Change Your Planet')
