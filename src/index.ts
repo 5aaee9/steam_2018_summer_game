@@ -28,6 +28,28 @@ async function SteamGame(userToken: string) {
     let times = 0
 
     while (true) {
+        const bossPlanet = await requests.getBossPlanet()
+        if (bossPlanet !== null) {
+            logger.info('>> Boss room founded, joining')
+            await requests.joinPlanetRequest(bossPlanet.id)
+            const planetInfo = await this.getPlanetInfoRequest(bossPlanet.id)
+            const zones = planetInfo.planets[0].zones
+                .filter(item => !item.captured)
+                .filter(item => item.type === 4)
+            if (zones.length === 0) {
+                continue
+            }
+            const zone = zones[0]
+            await requests.joinBossZone(zone.id)
+            let damage = await requests.sendBossDamage()
+            while (!damage.game_over) {
+                await Utils.Time.wait(5 * Utils.Time.Second)
+                damage = await requests.sendBossDamage()
+            }
+
+            continue
+        }
+
         times += 1
         const playerInfo = await requests.getPlayerInfoRequest()
 
