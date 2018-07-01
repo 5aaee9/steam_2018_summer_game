@@ -32,7 +32,7 @@ async function SteamGame(userToken: string) {
         if (bossPlanet !== null) {
             logger.info('>> Boss room founded, joining')
             await requests.joinPlanetRequest(bossPlanet.id)
-            const planetInfo = await this.getPlanetInfoRequest(bossPlanet.id)
+            const planetInfo = await requests.getPlanetInfoRequest(bossPlanet.id)
             const zones = planetInfo.planets[0].zones
                 .filter(item => !item.captured)
                 .filter(item => item.type === 4)
