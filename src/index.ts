@@ -40,7 +40,7 @@ async function SteamGame(userToken: string) {
                 continue
             }
             const zone = zones[0]
-            await requests.joinBossZone(zone.id)
+            await requests.joinBossZone(zone.zone_position)
             let damage = await requests.sendBossDamage()
             while (!damage.game_over) {
                 await Utils.Time.wait(5 * Utils.Time.Second)
