@@ -221,6 +221,11 @@ namespace Requests {
             const damageResponse: BossResponse = damageRequest.data.response
 
             this.waitForPlayer = damageResponse.waiting_for_players
+
+            if (damageResponse.boss_status === undefined) {
+                return damageResponse
+            }
+
             this.logger.info(`>> Boss HP: ${damageResponse.boss_status.boss_hp} / ${damageResponse.boss_status.boss_max_hp}`)
             return damageResponse
         }
